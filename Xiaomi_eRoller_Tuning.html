@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#FF6A00">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Xiaomi e-Roller Tuning</title>
+<style>
+:root{--o:#FF6A00;--od:#E55D00;--bg:#060606;--s:#101010;--s2:#181818;--s3:#242424;--b:#2A2A2A;--t:#F0F0F0;--m:#888;--g:#00E676;--r:#FF5252;--y:#FFD600;--bl:#40C4FF;--rad:16px;--safe:env(safe-area-inset-bottom,0px)}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--t);overflow-x:hidden;padding-bottom:calc(72px + var(--safe));line-height:1.4;-webkit-font-smoothing:antialiased}
+.hdr{position:sticky;top:0;z-index:50;background:rgba(6,6,6,.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding:12px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--b)}
+.brand{display:flex;align-items:center;gap:10px}
+.logo{width:36px;height:36px;background:linear-gradient(135deg,#FF8A00,var(--o));border-radius:10px;display:grid;place-items:center;font-weight:800;font-size:13px;color:#fff;box-shadow:0 3px 14px rgba(255,106,0,.4)}
+.brand h1{font-size:15px;font-weight:650}.brand p{font-size:10px;color:var(--m);margin-top:1px}
+.pill{display:flex;align-items:center;gap:5px;font-size:10px;font-weight:600;padding:4px 10px;border-radius:20px;background:rgba(255,82,82,.12);color:var(--r);transition:.3s}
+.pill.ok{background:rgba(0,230,118,.12);color:var(--g)}.pill.dm{background:rgba(64,196,255,.12);color:var(--bl)}.pill.pol{background:rgba(255,214,0,.18);color:var(--y)}
+.pill .d{width:6px;height:6px;border-radius:50%;background:currentColor;animation:pulse 1.8s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.wrap{padding:12px 12px 0;max-width:480px;margin:0 auto}
+.tab{display:none}.tab.on{display:block;animation:fi .22s ease}
+@keyframes fi{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.card{background:var(--s);border:1px solid var(--b);border-radius:var(--rad);padding:14px;margin-bottom:10px;position:relative}
+.ch{font-size:11px;font-weight:600;color:var(--m);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px}
+.ov{position:absolute;inset:0;background:rgba(6,6,6,.9);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border-radius:var(--rad);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;z-index:5;padding:18px;text-align:center}
+.ov.hide{display:none}.ov .ic{font-size:26px}.ov p{font-size:12px;color:var(--m);max-width:220px;line-height:1.4}
+.ob{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;margin-top:2px}
+.ob button{background:var(--o);color:#fff;border:none;border-radius:18px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer}
+.ob button.g{background:var(--s2);color:var(--t);border:1px solid var(--b)}
+.ring-wrap{display:flex;flex-direction:column;align-items:center;padding:4px 0}
+.ring{position:relative;width:168px;height:168px}
+.ring svg{transform:rotate(-90deg)}.ring .bg{fill:none;stroke:var(--s3);stroke-width:9}
+.ring .fg{fill:none;stroke:url(#grad);stroke-width:9;stroke-linecap:round;stroke-dasharray:484;stroke-dashoffset:484;transition:stroke-dashoffset .5s cubic-bezier(.4,0,.2,1)}
+.ring-c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring-n{font-size:46px;font-weight:700;letter-spacing:-1.5px;background:linear-gradient(180deg,#fff 25%,#FF8A00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1}
+.ring-u{font-size:12px;color:var(--m);margin-top:1px}
+.mode-tag{margin-top:8px;font-size:11px;font-weight:600;color:var(--o);background:rgba(255,106,0,.12);padding:3px 11px;border-radius:16px}
+.mode-tag.pol{color:var(--y);background:rgba(255,214,0,.15)}
+.sts{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:12px}
+.st{background:var(--s2);border-radius:11px;padding:9px 4px;text-align:center}
+.st .v{font-size:15px;font-weight:700;display:block}.st .l{font-size:9px;color:var(--m);margin-top:1px}
+.trip{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:10px}
+.ti{background:var(--s2);border-radius:11px;padding:10px 6px;text-align:center}
+.ti .v{font-size:14px;font-weight:700}.ti .l{font-size:9px;color:var(--m);margin-top:2px}
+.stages{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}
+.stg{background:var(--s2);border:1.5px solid var(--b);border-radius:12px;padding:12px 4px;text-align:center;cursor:pointer;transition:.2s;user-select:none}
+.stg:active{transform:scale(.96)}
+.stg.on{background:rgba(255,106,0,.14);border-color:var(--o);box-shadow:0 0 0 1px var(--o)}
+.stg .n{font-size:20px;font-weight:700}.stg .x{font-size:11px;color:var(--m);margin-top:3px}.stg .z{font-size:9px;color:var(--m);margin-top:2px}
+.stg.on .n{color:var(--o)}
+.lim{font-size:11px;color:var(--m);text-align:center;margin-top:8px}.lim b{color:var(--o)}
+.pol-btn{width:100%;padding:14px;border-radius:12px;border:2px solid var(--y);background:rgba(255,214,0,.1);color:var(--y);font-size:13px;font-weight:700;cursor:pointer;transition:.2s;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px}
+.pol-btn:active{transform:scale(.98)}.pol-btn.on{background:var(--y);color:#111;box-shadow:0 0 18px rgba(255,214,0,.35)}
+.throttle-bar{height:8px;background:var(--s3);border-radius:4px;overflow:hidden;margin-top:10px}
+.throttle-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--g),var(--o),var(--r));transition:width .4s}
+.throttle-lbl{display:flex;justify-content:space-between;font-size:10px;color:var(--m);margin-top:4px}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.ac{background:var(--s2);border:1px solid var(--b);border-radius:11px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;transition:.2s;font-size:11px;font-weight:500;color:var(--t);user-select:none}
+.ac:active{transform:scale(.96);background:var(--s3)}.ac .i{font-size:20px}
+.ac.on{border-color:var(--o);background:rgba(255,106,0,.1);color:var(--o)}
+.row{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--b)}
+.row:last-child{border-bottom:none;padding-bottom:0}.row:first-child{padding-top:0}
+.rt{font-size:13px;font-weight:500}.rd{font-size:10px;color:var(--m);margin-top:1px}
+.tog{position:relative;width:44px;height:26px;flex-shrink:0}
+.tog input{opacity:0;width:0;height:0}
+.tss{position:absolute;inset:0;cursor:pointer;background:#333;border-radius:26px;transition:.25s}
+.tss::before{content:"";position:absolute;width:20px;height:20px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.25s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.tog input:checked+.tss{background:var(--o)}.tog input:checked+.tss::before{transform:translateX(18px)}
+.seg{display:flex;background:var(--s2);border-radius:9px;overflow:hidden;border:1px solid var(--b)}
+.seg button{flex:1;border:none;background:transparent;color:var(--m);font-size:11px;font-weight:550;padding:8px 3px;cursor:pointer;transition:.2s}
+.seg button.on{background:var(--o);color:#fff}
+.btn{width:100%;border:none;border-radius:11px;padding:12px;font-size:13px;font-weight:600;cursor:pointer;transition:.2s;margin-top:7px}
+.btn:active{transform:scale(.98)}.btn-m{background:var(--o);color:#fff}.btn-g{background:var(--s2);color:var(--t);border:1px solid var(--b)}
+.btn-b{background:rgba(64,196,255,.12);color:var(--bl);border:1px solid rgba(64,196,255,.28)}.btn-y{background:rgba(255,214,0,.12);color:var(--y);border:1px solid rgba(255,214,0,.3)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.dc{display:flex;align-items:center;gap:10px;background:var(--s2);border-radius:11px;padding:11px;margin-top:8px;border:1px solid transparent}
+.dc.lk{border-color:var(--o)}.di{width:40px;height:40px;border-radius:10px;background:var(--s3);display:grid;place-items:center;font-size:18px}
+.dn{font-size:13px;font-weight:550}.dm{font-size:10px;color:var(--m)}
+.bar{height:5px;background:var(--s3);border-radius:3px;overflow:hidden;margin-top:5px}
+.bf{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--g),var(--o));transition:width .5s}
+.note{font-size:10px;color:var(--m);text-align:center;padding:10px 6px 2px;line-height:1.5}
+.hint{background:rgba(255,106,0,.07);border:1px solid rgba(255,106,0,.2);border-radius:11px;padding:10px 12px;font-size:11px;color:var(--m);margin-bottom:10px;line-height:1.45}
+.hint b{color:var(--o)}.hint.y{background:rgba(255,214,0,.08);border-color:rgba(255,214,0,.25)}.hint.y b{color:var(--y)}
+.hero{text-align:center;padding:16px 12px 8px}.hero .bi{font-size:44px;margin-bottom:8px}
+.hero h2{font-size:16px;font-weight:650;margin-bottom:4px}.hero p{font-size:12px;color:var(--m);line-height:1.45;max-width:270px;margin:0 auto 10px}
+.nav{position:fixed;bottom:0;left:0;right:0;z-index:50;background:rgba(10,10,10,.96);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--b);display:flex;justify-content:space-around;padding:5px 0 calc(6px + var(--safe))}
+.nv{background:none;border:none;color:var(--m);display:flex;flex-direction:column;align-items:center;gap:1px;padding:5px 10px;cursor:pointer;font-size:9px;font-weight:500;min-width:58px;transition:color .2s}
+.nv.on{color:var(--o)}.nv .ti{font-size:18px}
+.toast{position:fixed;bottom:calc(76px + var(--safe));left:50%;transform:translateX(-50%) translateY(24px);background:#1C1C1C;color:#fff;padding:10px 16px;border-radius:22px;font-size:12px;font-weight:500;border:1px solid var(--b);opacity:0;pointer-events:none;transition:.28s;z-index:100;max-width:88%;text-align:center;box-shadow:0 6px 20px rgba(0,0,0,.45)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.svc{font-size:10px;color:var(--m);margin-top:6px;line-height:1.5;word-break:break-all}
+/* Combo builder */
+.combo-pad{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.combo-key{background:var(--s2);border:1.5px solid var(--b);border-radius:12px;padding:16px 8px;text-align:center;cursor:pointer;font-size:13px;font-weight:600;user-select:none;transition:.15s}
+.combo-key:active{transform:scale(.95);background:var(--s3)}
+.combo-key.L{border-color:#5C6BC0}.combo-key.R{border-color:#EC407A}
+.combo-seq{min-height:36px;background:var(--s2);border-radius:10px;padding:8px 10px;font-size:12px;color:var(--m);margin-top:8px;word-break:break-all}
+.combo-seq span{display:inline-block;background:var(--s3);padding:2px 8px;border-radius:6px;margin:2px;color:var(--t);font-weight:600}
+.combo-target{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.combo-target button{flex:1;min-width:90px;padding:10px;border-radius:10px;border:1px solid var(--b);background:var(--s2);color:var(--m);font-size:11px;font-weight:600;cursor:pointer}
+.combo-target button.on{border-color:var(--o);background:rgba(255,106,0,.15);color:var(--o)}
+</style>
+</head>
+<body>
+<header class="hdr">
+  <div class="brand"><div class="logo">MI</div><div><h1>e-Roller Tuning</h1><p id="sub">Verbinden oder Demo</p></div></div>
+  <div class="pill" id="pill"><span class="d"></span><span id="pt">Offline</span></div>
+</header>
+<main class="wrap">
+
+<!-- DASH -->
+<section class="tab on" id="t-dash">
+  <div class="card">
+    <div class="ov" id="ovDash"><div class="ic">🔒</div><p>Verbinde deinen e-Roller oder starte die Demo.</p>
+      <div class="ob"><button onclick="go('conn')">Verbinden</button><button class="g" onclick="startDemo()">▶ Demo</button></div></div>
+    <div class="ring-wrap">
+      <div class="ring">
+        <svg width="168" height="168" viewBox="0 0 168 168">
+          <defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#00E676"/><stop offset="55%" stop-color="#FF6A00"/><stop offset="100%" stop-color="#FF3D00"/></linearGradient></defs>
+          <circle class="bg" cx="84" cy="84" r="77"/><circle class="fg" id="arc" cx="84" cy="84" r="77"/>
+        </svg>
+        <div class="ring-c"><div class="ring-n" id="vSp">—</div><div class="ring-u" id="vUnit">km/h</div></div>
+      </div>
+      <div class="mode-tag" id="vMode">Nicht aktiv</div>
+    </div>
+    <div class="throttle-bar"><div class="throttle-fill" id="thrFill" style="width:0%"></div></div>
+    <div class="throttle-lbl"><span>0</span><span id="thrMax">25</span><span>Limit</span></div>
+    <div class="sts">
+      <div class="st"><span class="v" id="vBat">—</span><div class="l">Akku</div></div>
+      <div class="st"><span class="v" id="vRng">—</span><div class="l">Rest</div></div>
+      <div class="st"><span class="v" id="vOdo">—</span><div class="l">Gesamt</div></div>
+      <div class="st"><span class="v" id="vTmp">—</span><div class="l">Motor</div></div>
+    </div>
+    <div class="trip">
+      <div class="ti"><div class="v" id="vTrip">0.0</div><div class="l">Trip km</div></div>
+      <div class="ti"><div class="v" id="vTime">00:00</div><div class="l">Fahrzeit</div></div>
+      <div class="ti"><div class="v" id="vAvg">0.0</div><div class="l">Ø km/h</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ov" id="ovStages"><div class="ic">🔒</div><p>Stufen freischalten</p>
+      <div class="ob"><button onclick="go('conn')">Verbinden</button><button class="g" onclick="startDemo()">▶ Demo</button></div></div>
+    <div class="ch">Geschwindigkeitsstufe</div>
+    <div class="stages">
+      <div class="stg" data-s="1" onclick="setStage(1)"><div class="n">1</div><div class="x">Eco</div><div class="z">max 15</div></div>
+      <div class="stg on" data-s="2" onclick="setStage(2)"><div class="n">2</div><div class="x">Normal</div><div class="z">max 20</div></div>
+      <div class="stg" data-s="3" onclick="setStage(3)"><div class="n">3</div><div class="x">Sport</div><div class="z">max 25</div></div>
+    </div>
+    <div class="lim">Aktives Limit: <b id="limTxt">20 km/h</b></div>
+    <button class="pol-btn" id="polBtn" onclick="togglePolice()">
+      <span>👮</span><span id="polTxt">Police / Drossel · 20 km/h</span>
+    </button>
+    <div class="hint y" style="margin-top:10px;margin-bottom:0">
+      <b>Drosselung:</b> Police Mode begrenzt sofort auf 20 km/h. Deine Stufe bleibt gespeichert und gilt wieder, sobald du Police Mode ausschaltest.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ov" id="ovActs"><div class="ic">🔒</div><p>Aktionen freischalten</p>
+      <div class="ob"><button onclick="go('conn')">Verbinden</button><button class="g" onclick="startDemo()">▶ Demo</button></div></div>
+    <div class="ch">Schnellaktionen</div>
+    <div class="acts">
+      <div class="ac" id="aLock" onclick="doLock()"><span class="i" id="iLock">🔒</span><span id="tLock">Sperren</span></div>
+      <div class="ac" id="aLight" onclick="doLight()"><span class="i">💡</span><span id="tLight">Licht</span></div>
+      <div class="ac" onclick="doFind()"><span class="i">📍</span><span>Suchen</span></div>
+      <div class="ac" id="aCruise" onclick="doCruise()"><span class="i">🚗</span><span id="tCruise">Cruise</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- TUNE -->
+<section class="tab" id="t-tune">
+  <div class="hint"><b>Legal:</b> Max. 25 km/h (Sport). Kombi nur für legale Aktionen (Police / Sperre / Suchen).</div>
+  <div class="card">
+    <div class="ov" id="ovTune"><div class="ic">🔒</div><p>Tuning freischalten</p>
+      <div class="ob"><button onclick="go('conn')">Verbinden</button><button class="g" onclick="startDemo()">▶ Demo</button></div></div>
+
+    <div class="ch">Eigene Kombi (frei wählbar)</div>
+    <p class="rd" style="margin-bottom:6px">Lege eine Tastenfolge fest (z. B. L L R R L). Damit aktivierst du die gewählte Aktion – ohne Geheim-Unlock für höhere Speed.</p>
+    <div class="combo-target">
+      <button class="on" data-t="police" onclick="setComboTarget('police',this)">👮 Police</button>
+      <button data-t="lock" onclick="setComboTarget('lock',this)">🔒 Sperre</button>
+      <button data-t="find" onclick="setComboTarget('find',this)">📍 Suchen</button>
+    </div>
+    <div class="combo-pad">
+      <div class="combo-key L" onclick="comboPress('L')">◀ Links (L)</div>
+      <div class="combo-key R" onclick="comboPress('R')">Rechts (R) ▶</div>
+    </div>
+    <div class="combo-seq" id="comboSeq">Noch keine Kombi – tippe L / R</div>
+    <div style="display:flex;gap:6px;margin-top:8px">
+      <button class="btn btn-g" style="margin:0;flex:1" onclick="comboClear()">Löschen</button>
+      <button class="btn btn-m" style="margin:0;flex:1" onclick="comboSave()">Kombi speichern</button>
+    </div>
+    <p class="rd" style="margin-top:8px" id="comboSaved">Gespeichert: —</p>
+
+    <div class="ch" style="margin-top:16px">Anfahren</div>
+    <div class="row"><div><div class="rt">Zero-Start</div><div class="rd">Ab 0 km/h</div></div>
+      <label class="tog"><input type="checkbox" id="sZero" onchange="onZero()"><span class="tss"></span></label></div>
+    <div class="row"><div><div class="rt">Startgeschwindigkeit</div><div class="rd">Mindest-km/h</div></div>
+      <div class="seg" style="width:128px" id="sgStart">
+        <button data-v="0" onclick="setStart(0,this)">0</button>
+        <button data-v="3" onclick="setStart(3,this)">3</button>
+        <button class="on" data-v="4" onclick="setStart(4,this)">4</button>
+        <button data-v="5" onclick="setStart(5,this)">5</button>
+      </div></div>
+
+    <div class="ch" style="margin-top:14px">Rekuperation</div>
+    <div class="seg" id="sgRegen">
+      <button class="on" data-v="0" onclick="setRegen(0,this)">Schwach</button>
+      <button data-v="1" onclick="setRegen(1,this)">Mittel</button>
+      <button data-v="2" onclick="setRegen(2,this)">Stark</button>
+    </div>
+
+    <div class="ch" style="margin-top:14px">Sperre & Sicherheit</div>
+    <div class="row"><div><div class="rt">Motor-Sperre</div><div class="rd">Block + Alarm</div></div>
+      <label class="tog"><input type="checkbox" id="sMLock" onchange="onMLock()"><span class="tss"></span></label></div>
+    <div class="row"><div><div class="rt">Auto-Sperren</div><div class="rd">Nach Ausschalten</div></div>
+      <label class="tog"><input type="checkbox" id="sALock" checked onchange="save()"><span class="tss"></span></label></div>
+    <div class="row"><div><div class="rt">E-ABS</div><div class="rd">Elektronische Bremse</div></div>
+      <label class="tog"><input type="checkbox" id="sEabs" checked onchange="save()"><span class="tss"></span></label></div>
+    <div class="row"><div><div class="rt">TCS</div><div class="rd">Traktionskontrolle</div></div>
+      <label class="tog"><input type="checkbox" id="sTcs" checked onchange="save()"><span class="tss"></span></label></div>
+
+    <div class="ch" style="margin-top:14px">Licht & Komfort</div>
+    <div class="row"><div><div class="rt">Cruise Control</div><div class="rd">Tempo halten</div></div>
+      <label class="tog"><input type="checkbox" id="sCruise" onchange="save()"><span class="tss"></span></label></div>
+    <div class="row"><div><div class="rt">Auto-Licht</div><div class="rd">Bei Dunkelheit</div></div>
+      <label class="tog"><input type="checkbox" id="sAutoL" checked onchange="save()"><span class="tss"></span></label></div>
+    <div class="row"><div><div class="rt">Bremslicht</div><div class="rd">Bei Bremse heller</div></div>
+      <label class="tog"><input type="checkbox" id="sBrakeL" checked onchange="save()"><span class="tss"></span></label></div>
+    <div class="row"><div><div class="rt">Rücklicht dauerhaft</div><div class="rd">Auch bei Tag</div></div>
+      <label class="tog"><input type="checkbox" id="sTail" onchange="save()"><span class="tss"></span></label></div>
+
+    <div class="ch" style="margin-top:14px">Laden & Anzeige</div>
+    <div class="row"><div><div class="rt">Ladegrenze</div><div class="rd">Akku schonen</div></div>
+      <div class="seg" style="width:130px" id="sgChg">
+        <button data-v="80" onclick="setChg(80,this)">80%</button>
+        <button data-v="90" onclick="setChg(90,this)">90%</button>
+        <button class="on" data-v="100" onclick="setChg(100,this)">100%</button>
+      </div></div>
+    <div class="row"><div><div class="rt">Einheit</div><div class="rd">km/h oder mph</div></div>
+      <div class="seg" style="width:110px" id="sgUnit">
+        <button class="on" data-v="km" onclick="setUnit('km',this)">km/h</button>
+        <button data-v="mi" onclick="setUnit('mi',this)">mph</button>
+      </div></div>
+
+    <button class="btn btn-m" onclick="applyAll()">✓ Anwenden</button>
+    <button class="btn btn-g" onclick="resetAll()">↺ Werkseinstellungen</button>
+    <button class="btn btn-g" onclick="exportCfg()">💾 Exportieren</button>
+  </div>
+</section>
+
+<!-- CONN -->
+<section class="tab" id="t-conn">
+  <div class="hero"><div class="bi">🛵</div><h2>e-Roller verbinden</h2>
+    <p>Bluetooth oder Demo. Chrome / Edge empfohlen.</p></div>
+  <div class="hint"><b>Tipp:</b> Roller an, Bluetooth an, nah heran.</div>
+  <div class="card">
+    <div class="ch">Bluetooth</div>
+    <button class="btn btn-m" id="btnScan" onclick="scanBT()">🔍 Xiaomi e-Roller suchen</button>
+    <button class="btn btn-g" id="btnDisc" onclick="disconnect()" disabled>Trennen</button>
+    <button class="btn btn-g" id="btnRetry" onclick="scanBT()" style="display:none">🔄 Erneut</button>
+    <div id="devBox"></div><div class="svc" id="svcInfo"></div>
+  </div>
+  <div class="card">
+    <div class="ch">Demo</div>
+    <p style="font-size:11px;color:var(--m);margin-bottom:8px">Alles testen ohne Gerät – inkl. Kombi & Drossel.</p>
+    <button class="btn btn-b" id="btnDemo" onclick="toggleDemo()">▶ Demo starten</button>
+    <div id="demoMaxBox" style="margin-top:12px;display:none">
+      <div class="ch">Demo-Maximalgeschwindigkeit</div>
+      <p style="font-size:11px;color:var(--m);margin-bottom:8px">Nur in der <b style="color:var(--bl)">Demo</b> – legt fest, wie hoch Stufe 3 (Sport) simuliert wird. Bei echter Verbindung gilt weiterhin max. 25 km/h.</p>
+      <div class="seg" id="sgDemoMax">
+        <button data-v="15" onclick="setDemoMax(15,this)">15</button>
+        <button data-v="20" onclick="setDemoMax(20,this)">20</button>
+        <button class="on" data-v="25" onclick="setDemoMax(25,this)">25</button>
+        <button data-v="30" onclick="setDemoMax(30,this)">30</button>
+        <button data-v="35" onclick="setDemoMax(35,this)">35</button>
+        <button data-v="40" onclick="setDemoMax(40,this)">40</button>
+      </div>
+      <p style="font-size:11px;color:var(--bl);margin-top:8px;text-align:center">Aktuell: <b id="demoMaxLbl">25</b> km/h (Demo Stufe 3)</p>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ch">Status</div>
+    <div class="row"><div class="rt">Gerät</div><span id="stDev" style="font-size:12px;color:var(--m)">—</span></div>
+    <div class="row"><div class="rt">Modus</div><span id="stMode" style="font-size:12px;color:var(--m)">Offline</span></div>
+    <div class="row"><div class="rt">Services</div><span id="stSvc" style="font-size:12px;color:var(--m)">—</span></div>
+    <div class="row"><div class="rt">Region</div><span style="font-size:12px;color:var(--m)">Legal · max 25 km/h</span></div>
+  </div>
+</section>
+
+<!-- DIAG -->
+<section class="tab" id="t-diag">
+  <div class="card">
+    <div class="ov" id="ovDiag"><div class="ic">🔒</div><p>Diagnose freischalten</p>
+      <div class="ob"><button onclick="go('conn')">Verbinden</button><button class="g" onclick="startDemo()">▶ Demo</button></div></div>
+    <div class="ch">Batterie</div>
+    <div class="row"><div class="rt">Gesundheit</div><span id="dH" style="font-size:12px">—</span></div>
+    <div class="bar"><div class="bf" id="dB" style="width:0%"></div></div>
+    <div class="row" style="margin-top:8px"><div class="rt">Zyklen</div><span id="dC" style="font-size:12px">—</span></div>
+    <div class="row"><div class="rt">Spannung</div><span id="dV" style="font-size:12px">—</span></div>
+    <div class="row"><div class="rt">Temperatur</div><span id="dT" style="font-size:12px">—</span></div>
+  </div>
+  <div class="card">
+    <div class="ch">Wartung</div>
+    <div class="row"><div><div class="rt">Reifen</div><div class="rd">Alle 200 km</div></div><span id="m1" style="font-size:11px;color:var(--m)">—</span></div>
+    <div class="row"><div><div class="rt">Schrauben</div><div class="rd">Lenker / Klappgelenk</div></div><span id="m2" style="font-size:11px;color:var(--m)">—</span></div>
+    <div class="row"><div><div class="rt">Bremsen</div><div class="rd">Beläge & Seil</div></div><span id="m3" style="font-size:11px;color:var(--m)">—</span></div>
+  </div>
+  <div class="card">
+    <div class="ch">Session</div>
+    <div class="row"><div class="rt">Trip zurücksetzen</div>
+      <button class="btn btn-g" style="margin:0;width:auto;padding:8px 14px;font-size:12px" onclick="resetTrip()">↺ Reset</button></div>
+  </div>
+  <div class="card">
+    <div class="ch">Info</div>
+    <div class="row"><div class="rt">Firmware</div><span id="iFw" style="font-size:12px;color:var(--m)">—</span></div>
+    <div class="row"><div class="rt">Version</div><span style="font-size:12px;color:var(--m)">2.5 · Legal · Kombi</span></div>
+  </div>
+  <p class="note">Max. 25 km/h · Keine geheimen Speed-Unlocks · Kombi nur für Police / Sperre / Suchen.</p>
+</section>
+</main>
+
+<nav class="nav">
+  <button class="nv on" data-t="dash" onclick="go('dash',this)"><span class="ti">🛵</span>Dashboard</button>
+  <button class="nv" data-t="tune" onclick="go('tune',this)"><span class="ti">⚙️</span>Tuning</button>
+  <button class="nv" data-t="conn" onclick="go('conn',this)"><span class="ti">📶</span>Verbinden</button>
+  <button class="nv" data-t="diag" onclick="go('diag',this)"><span class="ti">🔧</span>Diagnose</button>
+</nav>
+<div class="toast" id="toast"></div>
+
+<script>
+const S={
+  on:false,linked:false,demo:false,device:null,server:null,
+  stage:2,police:false,demoMax:25,
+  locked:false,light:false,cruise:false,zero:false,
+  regen:0,start:4,charge:100,unit:'km',
+  speed:0,bat:87,range:28,odo:1247.3,temp:31,
+  trip:0,tripTime:0,tripStart:0,timer:null,
+  comboDraft:[], comboSaved:[], comboTarget:'police', comboBuf:[]
+};
+const STAGE={1:{name:'Stufe 1 · Eco',max:15},2:{name:'Stufe 2 · Normal',max:20},3:{name:'Stufe 3 · Sport',max:25}};
+
+function toast(m){const e=document.getElementById('toast');e.textContent=m;e.classList.add('show');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('show'),2300)}
+function go(id,btn){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));document.getElementById('t-'+id).classList.add('on');document.querySelectorAll('.nv').forEach(n=>n.classList.remove('on'));if(btn)btn.classList.add('on');else document.querySelector(`.nv[data-t="${id}"]`)?.classList.add('on')}
+function pill(type,txt){const p=document.getElementById('pill');p.className='pill'+(type==='ok'?' ok':type==='dm'?' dm':type==='pol'?' pol':'');document.getElementById('pt').textContent=txt}
+function maxSpeed(){
+  if(S.police)return 20;
+  if(S.demo){
+    // Demo: Stufe 1/2 feste Limits, Stufe 3 = einstellbares Demo-Max
+    if(S.stage===1)return 15;
+    if(S.stage===2)return 20;
+    return Math.max(15, Math.min(50, S.demoMax||25));
+  }
+  return STAGE[S.stage].max;
+}
+function unlock(on){S.on=on;['ovDash','ovStages','ovActs','ovTune','ovDiag'].forEach(id=>document.getElementById(id).classList.toggle('hide',on));if(on){fillDiag();startLoop()}else{stopLoop();resetDisp()}ui()}
+function fillDiag(){document.getElementById('dH').textContent='94 %';document.getElementById('dB').style.width='94%';document.getElementById('dC').textContent='187';document.getElementById('dV').textContent='41.2 V';document.getElementById('dT').textContent='28 °C';document.getElementById('m1').textContent='Fällig';document.getElementById('m1').style.color='var(--y)';document.getElementById('m2').textContent='OK';document.getElementById('m2').style.color='var(--g)';document.getElementById('m3').textContent='OK';document.getElementById('m3').style.color='var(--g)';document.getElementById('iFw').textContent='BLE 1.5.x'}
+function resetDisp(){['vSp','vBat','vRng','vOdo','vTmp'].forEach(i=>document.getElementById(i).textContent='—');document.getElementById('vMode').textContent='Nicht aktiv';document.getElementById('vMode').classList.remove('pol');document.getElementById('arc').style.strokeDashoffset=484;document.getElementById('thrFill').style.width='0%';document.getElementById('vTrip').textContent='0.0';document.getElementById('vTime').textContent='00:00';document.getElementById('vAvg').textContent='0.0';['dH','dC','dV','dT','iFw'].forEach(i=>document.getElementById(i).textContent='—');document.getElementById('dB').style.width='0%';['m1','m2','m3'].forEach(i=>{document.getElementById(i).textContent='—';document.getElementById(i).style.color='var(--m)'})}
+function toU(kmh){return S.unit==='mi'?kmh*0.621371:kmh}
+function ui(){
+  if(!S.on)return;
+  const circ=2*Math.PI*77,max=maxSpeed(),pct=Math.min(S.speed/25,1);
+  document.getElementById('arc').style.strokeDashoffset=circ*(1-pct);
+  document.getElementById('thrFill').style.width=(Math.min(S.speed/max,1)*100)+'%';
+  document.getElementById('thrMax').textContent=max;
+  document.getElementById('vSp').textContent=Math.round(toU(S.speed));
+  document.getElementById('vUnit').textContent=S.unit==='mi'?'mph':'km/h';
+  const label=S.police?'👮 Police · max 20':STAGE[S.stage].name;
+  document.getElementById('vMode').textContent=label+(S.demo?' · Demo':'');
+  document.getElementById('vMode').classList.toggle('pol',S.police);
+  document.getElementById('limTxt').textContent=max+' km/h';
+  document.getElementById('vBat').textContent=Math.round(S.bat)+'%';
+  document.getElementById('vRng').textContent=Math.round(toU(S.range))+(S.unit==='mi'?' mi':' km');
+  document.getElementById('vOdo').textContent=S.odo>=1000?(S.odo/1000).toFixed(1)+'k':Math.round(S.odo);
+  document.getElementById('vTmp').textContent=Math.round(S.temp)+'°';
+  document.getElementById('vTrip').textContent=toU(S.trip).toFixed(1);
+  const sec=Math.floor(S.tripTime/1000);
+  document.getElementById('vTime').textContent=String(Math.floor(sec/60)).padStart(2,'0')+':'+String(sec%60).padStart(2,'0');
+  const avg=S.tripTime>5000?S.trip/(S.tripTime/3600000):0;
+  document.getElementById('vAvg').textContent=toU(avg).toFixed(1);
+  document.querySelectorAll('.stg').forEach(s=>s.classList.toggle('on',+s.dataset.s===S.stage&&!S.police));
+  document.getElementById('polBtn').classList.toggle('on',S.police);
+  document.getElementById('polTxt').textContent=S.police?'Police AN · 20 km/h':'Police / Drossel · 20 km/h';
+}
+function need(){if(!S.on){toast('Verbinden oder Demo starten');go('conn');return false}return true}
+
+function setStage(n){if(!need())return;if(S.police){toast('Zuerst Police Mode aus');return}S.stage=n;save();ui();const m=maxSpeed();toast('Stufe '+n+' · max '+m+' km/h'+(S.demo&&n===3?' (Demo)':''))}
+function setDemoMax(v,btn){
+  S.demoMax=v;
+  document.querySelectorAll('#sgDemoMax button').forEach(b=>b.classList.remove('on'));
+  if(btn)btn.classList.add('on');
+  else document.querySelectorAll('#sgDemoMax button').forEach(b=>b.classList.toggle('on',+b.dataset.v===v));
+  document.getElementById('demoMaxLbl').textContent=v;
+  // Update stage 3 label on dashboard
+  const z=document.querySelector('.stg[data-s="3"] .z');
+  if(z)z.textContent='max '+(S.demo?v:25);
+  save();ui();
+  toast('Demo-Max: '+v+' km/h (nur Simulation)');
+}
+function togglePolice(){if(!need())return;S.police=!S.police;if(S.police){if(S.speed>20)S.speed=20;pill('pol','Police 20');toast('👮 Drossel AN · max 20 km/h')}else{if(S.linked)pill('ok','Verbunden');else if(S.demo)pill('dm','Demo');toast('Drossel AUS · Stufe '+S.stage)}ui()}
+
+/* COMBO – user chooses sequence, only legal targets */
+function setComboTarget(t,btn){S.comboTarget=t;document.querySelectorAll('.combo-target button').forEach(b=>b.classList.remove('on'));btn.classList.add('on')}
+function comboPress(k){
+  if(!need())return;
+  S.comboDraft.push(k);
+  if(S.comboDraft.length>12)S.comboDraft.shift();
+  renderComboDraft();
+  // Also feed live buffer for trigger
+  S.comboBuf.push(k);
+  if(S.comboBuf.length>12)S.comboBuf.shift();
+  checkComboTrigger();
+}
+function renderComboDraft(){
+  const el=document.getElementById('comboSeq');
+  if(!S.comboDraft.length){el.innerHTML='Noch keine Kombi – tippe L / R';return}
+  el.innerHTML=S.comboDraft.map(k=>'<span>'+k+'</span>').join('');
+}
+function comboClear(){S.comboDraft=[];renderComboDraft();toast('Kombi gelöscht')}
+function comboSave(){
+  if(!need())return;
+  if(S.comboDraft.length<2){toast('Mindestens 2 Tasten');return}
+  S.comboSaved=[...S.comboDraft];
+  save();
+  document.getElementById('comboSaved').textContent='Gespeichert: '+S.comboSaved.join(' ')+' → '+({police:'Police',lock:'Sperre',find:'Suchen'}[S.comboTarget]);
+  toast('Kombi gespeichert');
+}
+function checkComboTrigger(){
+  if(!S.comboSaved.length)return;
+  const buf=S.comboBuf.join('');
+  const need=S.comboSaved.join('');
+  if(buf.endsWith(need)){
+    S.comboBuf=[];
+    if(S.comboTarget==='police')togglePolice();
+    else if(S.comboTarget==='lock')doLock();
+    else if(S.comboTarget==='find')doFind();
+  }
+}
+
+function doLock(){if(!need())return;S.locked=!S.locked;document.getElementById('sMLock').checked=S.locked;document.getElementById('aLock').classList.toggle('on',S.locked);document.getElementById('iLock').textContent=S.locked?'🔓':'🔒';document.getElementById('tLock').textContent=S.locked?'Entsperren':'Sperren';toast(S.locked?'Motor gesperrt':'Motor entsperrt');if(S.locked)S.speed=0}
+function doLight(){if(!need())return;S.light=!S.light;document.getElementById('aLight').classList.toggle('on',S.light);document.getElementById('tLight').textContent=S.light?'Licht an':'Licht';toast(S.light?'Licht an':'Licht aus')}
+function doFind(){if(!need())return;toast('🔍 Suchsignal'+(S.demo?' (Demo)':''));if(navigator.vibrate)navigator.vibrate([100,50,100,50,150]);
+  try{const ctx=new(window.AudioContext||window.webkitAudioContext)();const o=ctx.createOscillator();const g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=880;g.gain.value=.15;o.start();g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.4);o.stop(ctx.currentTime+.4)}catch(e){}}
+function doCruise(){if(!need())return;S.cruise=!S.cruise;document.getElementById('sCruise').checked=S.cruise;document.getElementById('aCruise').classList.toggle('on',S.cruise);document.getElementById('tCruise').textContent=S.cruise?'Cruise an':'Cruise';save();toast(S.cruise?'Cruise an':'Cruise aus')}
+
+function onZero(){if(!need()){document.getElementById('sZero').checked=S.zero;return}S.zero=document.getElementById('sZero').checked;if(S.zero){S.start=0;document.querySelectorAll('#sgStart button').forEach(b=>b.classList.toggle('on',+b.dataset.v===0));toast('Zero-Start an')}else{S.start=4;document.querySelectorAll('#sgStart button').forEach(b=>b.classList.toggle('on',+b.dataset.v===4));toast('Zero-Start aus')}save()}
+function onMLock(){if(!need()){document.getElementById('sMLock').checked=S.locked;return}S.locked=document.getElementById('sMLock').checked;document.getElementById('aLock').classList.toggle('on',S.locked);document.getElementById('iLock').textContent=S.locked?'🔓':'🔒';document.getElementById('tLock').textContent=S.locked?'Entsperren':'Sperren';toast(S.locked?'Sperre an':'Sperre aus');if(S.locked)S.speed=0;save()}
+function setRegen(v,b){if(!need())return;S.regen=v;document.querySelectorAll('#sgRegen button').forEach(x=>x.classList.remove('on'));b.classList.add('on');save();toast('Rekuperation: '+['Schwach','Mittel','Stark'][v])}
+function setStart(v,b){if(!need())return;S.start=v;S.zero=v===0;document.getElementById('sZero').checked=S.zero;document.querySelectorAll('#sgStart button').forEach(x=>x.classList.remove('on'));b.classList.add('on');save();toast(v===0?'Zero-Start':'Start: '+v)}
+function setChg(v,b){if(!need())return;S.charge=v;document.querySelectorAll('#sgChg button').forEach(x=>x.classList.remove('on'));b.classList.add('on');save();toast('Ladegrenze: '+v+'%')}
+function setUnit(u,b){if(!need())return;S.unit=u;document.querySelectorAll('#sgUnit button').forEach(x=>x.classList.remove('on'));b.classList.add('on');save();ui();toast(u==='mi'?'mph':'km/h')}
+
+function save(){if(!S.on&&!S.demo)return;localStorage.setItem('mi_er_v25',JSON.stringify({stage:S.stage,demoMax:S.demoMax,regen:S.regen,start:S.start,charge:S.charge,zero:S.zero,unit:S.unit,combo:S.comboSaved,comboTarget:S.comboTarget,cruise:document.getElementById('sCruise').checked,eabs:document.getElementById('sEabs').checked,tcs:document.getElementById('sTcs').checked,autoL:document.getElementById('sAutoL').checked,brakeL:document.getElementById('sBrakeL').checked,aLock:document.getElementById('sALock').checked,tail:document.getElementById('sTail').checked,mLock:document.getElementById('sMLock').checked}))}
+function load(){try{const d=JSON.parse(localStorage.getItem('mi_er_v25')||'{}');
+  if(d.stage)S.stage=d.stage;if(d.demoMax)S.demoMax=d.demoMax;if(d.regen!=null)S.regen=d.regen;if(d.start!=null)S.start=d.start;if(d.charge)S.charge=d.charge;if(d.zero!=null)S.zero=d.zero;if(d.unit)S.unit=d.unit;
+  if(d.combo)S.comboSaved=d.combo;if(d.comboTarget)S.comboTarget=d.comboTarget;
+  if(d.cruise!=null)document.getElementById('sCruise').checked=d.cruise;if(d.eabs!=null)document.getElementById('sEabs').checked=d.eabs;
+  if(d.tcs!=null)document.getElementById('sTcs').checked=d.tcs;if(d.autoL!=null)document.getElementById('sAutoL').checked=d.autoL;
+  if(d.brakeL!=null)document.getElementById('sBrakeL').checked=d.brakeL;if(d.aLock!=null)document.getElementById('sALock').checked=d.aLock;
+  if(d.tail!=null)document.getElementById('sTail').checked=d.tail;if(d.mLock!=null){document.getElementById('sMLock').checked=d.mLock;S.locked=d.mLock}
+  document.getElementById('sZero').checked=S.zero;
+  document.querySelectorAll('#sgRegen button').forEach(b=>b.classList.toggle('on',+b.dataset.v===S.regen));
+  document.querySelectorAll('#sgStart button').forEach(b=>b.classList.toggle('on',+b.dataset.v===S.start));
+  document.querySelectorAll('#sgChg button').forEach(b=>b.classList.toggle('on',+b.dataset.v===S.charge));
+  document.querySelectorAll('#sgUnit button').forEach(b=>b.classList.toggle('on',b.dataset.v===S.unit));
+  document.querySelectorAll('.combo-target button').forEach(b=>b.classList.toggle('on',b.dataset.t===S.comboTarget));
+  if(S.comboSaved.length)document.getElementById('comboSaved').textContent='Gespeichert: '+S.comboSaved.join(' ')+' → '+({police:'Police',lock:'Sperre',find:'Suchen'}[S.comboTarget]||S.comboTarget);
+}catch(e){}}
+function applyAll(){if(!need())return;save();toast(S.linked?'✓ Gesendet':'✓ Demo gespeichert')}
+function resetAll(){if(!need())return;S.stage=2;S.police=false;S.regen=0;S.start=4;S.charge=100;S.zero=false;S.locked=false;S.unit='km';S.comboSaved=[];S.comboDraft=[];
+  ['sZero','sCruise','sTail','sMLock'].forEach(i=>document.getElementById(i).checked=false);
+  ['sEabs','sTcs','sAutoL','sBrakeL','sALock'].forEach(i=>document.getElementById(i).checked=true);
+  document.getElementById('aLock').classList.remove('on');document.getElementById('iLock').textContent='🔒';document.getElementById('tLock').textContent='Sperren';
+  document.querySelectorAll('#sgRegen button').forEach(b=>b.classList.toggle('on',+b.dataset.v===0));
+  document.querySelectorAll('#sgStart button').forEach(b=>b.classList.toggle('on',+b.dataset.v===4));
+  document.querySelectorAll('#sgChg button').forEach(b=>b.classList.toggle('on',+b.dataset.v===100));
+  document.querySelectorAll('#sgUnit button').forEach(b=>b.classList.toggle('on',b.dataset.v==='km'));
+  renderComboDraft();document.getElementById('comboSaved').textContent='Gespeichert: —';
+  if(S.linked)pill('ok','Verbunden');else if(S.demo)pill('dm','Demo');
+  save();ui();toast('Werkseinstellungen')}
+function exportCfg(){if(!need())return;const cfg={version:'2.5',stage:S.stage,police:S.police,combo:S.comboSaved,comboTarget:S.comboTarget,zero:S.zero,start:S.start,regen:S.regen,charge:S.charge,unit:S.unit,exported:new Date().toISOString()};
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(cfg,null,2)],{type:'application/json'}));a.download='xiaomi_eroller_settings.json';a.click();toast('Exportiert')}
+function resetTrip(){if(!need())return;S.trip=0;S.tripTime=0;S.tripStart=Date.now();ui();toast('Trip zurückgesetzt')}
+
+function startDemo(){if(S.linked)disconnect();S.demo=true;S.linked=false;document.getElementById('btnDemo').textContent='⏹ Demo beenden';
+  document.getElementById('stMode').textContent='Demo';document.getElementById('stMode').style.color='var(--bl)';
+  document.getElementById('stDev').textContent='Demo';document.getElementById('stSvc').textContent='—';document.getElementById('sub').textContent='Demo aktiv';
+  document.getElementById('demoMaxBox').style.display='block';
+  setDemoMax(S.demoMax||25,null);
+  pill('dm','Demo');unlock(true);toast('Demo gestartet – Max-km/h einstellbar')}
+function stopDemo(){S.demo=false;S.police=false;document.getElementById('btnDemo').textContent='▶ Demo starten';
+  document.getElementById('stMode').textContent='Offline';document.getElementById('stMode').style.color='var(--m)';
+  document.getElementById('stDev').textContent='—';document.getElementById('sub').textContent='Verbinden oder Demo';
+  document.getElementById('demoMaxBox').style.display='none';
+  const z=document.querySelector('.stg[data-s="3"] .z');if(z)z.textContent='max 25';
+  pill('','Offline');unlock(false);toast('Demo beendet')}
+function toggleDemo(){S.demo?stopDemo():startDemo()}
+
+async function scanBT(){
+  if(!navigator.bluetooth){toast('Web Bluetooth nicht verfügbar');return}
+  try{
+    toast('Suche e-Roller…');
+    const device=await navigator.bluetooth.requestDevice({
+      filters:[
+        {namePrefix:'Mi Electric Scooter'},{namePrefix:'Mi Scooter'},{namePrefix:'Xiaomi'},
+        {namePrefix:'Ninebot'},{namePrefix:'dreame.scooter'},{namePrefix:'NB'},{namePrefix:'Mi'},{namePrefix:'Scooter'},
+        {services:['0000fe95-0000-1000-8000-00805f9b34fb']},{services:['6e400001-b5a3-f393-e0a9-e50e24dcca9e']}
+      ],
+      optionalServices:['0000fe95-0000-1000-8000-00805f9b34fb','6e400001-b5a3-f393-e0a9-e50e24dcca9e',
+        '00000100-0065-6c62-2e74-6f696d2e696d','battery_service','device_information','generic_access']
+    });
+    S.device=device;device.addEventListener('gattserverdisconnected',onDisc);
+    toast('Verbinde…');const server=await device.gatt.connect();S.server=server;
+    if(S.demo)stopDemo();S.linked=true;S.demo=false;
+    let svcCount=0,svcNames=[];
+    try{const services=await server.getPrimaryServices();svcCount=services.length;
+      for(const s of services){const u=s.uuid.toLowerCase();
+        if(u.includes('fe95'))svcNames.push('Xiaomi Auth');
+        else if(u.includes('6e400001'))svcNames.push('Nordic UART');
+        else if(u.includes('battery')||u.includes('180f')){svcNames.push('Battery');
+          try{const ch=await s.getCharacteristic('00002a19-0000-1000-8000-00805f9b34fb');const v=await ch.readValue();S.bat=v.getUint8(0)}catch(e){}}
+        else if(u.includes('device_information'))svcNames.push('Device Info');
+        else svcNames.push(u.slice(0,8)+'…');
+      }
+    }catch(e){svcNames.push('(eingeschränkt)')}
+    document.getElementById('stDev').textContent=device.name||'Xiaomi e-Roller';
+    document.getElementById('stMode').textContent='BLE verbunden';document.getElementById('stMode').style.color='var(--g)';
+    document.getElementById('stSvc').textContent=svcCount?svcCount+' Services':'—';
+    document.getElementById('sub').textContent='Verbunden';document.getElementById('btnDisc').disabled=false;
+    document.getElementById('btnRetry').style.display='none';document.getElementById('btnDemo').textContent='▶ Demo starten';
+    document.getElementById('devBox').innerHTML=`<div class="dc lk"><div class="di">🛵</div><div><div class="dn">${device.name||'Xiaomi e-Roller'}</div><div class="dm">Verbunden · BLE</div></div></div>`;
+    document.getElementById('svcInfo').textContent=svcNames.length?'Services: '+svcNames.join(', '):'';
+    pill('ok','Verbunden');unlock(true);toast('Verbunden · '+svcCount+' Services');
+  }catch(err){
+    if(err.name==='NotFoundError')toast('Kein Gerät gewählt');
+    else toast('Fehler: '+(err.message||'Verbindung fehlgeschlagen'));
+    document.getElementById('btnRetry').style.display='block';
+  }
+}
+function onDisc(){S.linked=false;document.getElementById('btnDisc').disabled=true;document.getElementById('devBox').innerHTML='';document.getElementById('svcInfo').textContent='';
+  document.getElementById('btnRetry').style.display='block';
+  if(!S.demo){document.getElementById('stDev').textContent='—';document.getElementById('stMode').textContent='Offline';
+    document.getElementById('stMode').style.color='var(--m)';document.getElementById('stSvc').textContent='—';
+    document.getElementById('sub').textContent='Verbinden oder Demo';pill('','Offline');unlock(false)}
+  toast('Getrennt')}
+function disconnect(){if(S.device?.gatt?.connected)S.device.gatt.disconnect();onDisc()}
+
+function startLoop(){
+  stopLoop();S.bat=S.bat||87;S.range=28;S.odo=1247.3;S.temp=31;S.speed=0;S.tripStart=Date.now();S.trip=0;S.tripTime=0;
+  S.timer=setInterval(()=>{
+    if(!S.on)return;
+    const max=maxSpeed();
+    if(S.locked)S.speed=Math.max(0,S.speed-1.4);
+    else{const t=5+Math.random()*(max-5)*.9;S.speed+=(t-S.speed)*.08;if(S.speed<.3)S.speed=0;if(S.speed>max)S.speed=max}
+    if(S.speed>3){S.bat=Math.max(5,S.bat-.005);S.range=Math.max(1,S.bat*.32);S.odo+=S.speed/3600;S.trip+=S.speed/3600}
+    S.tripTime=Date.now()-S.tripStart;S.temp=27+S.speed*.16+Math.random()*1.2;ui();
+  },650);
+}
+function stopLoop(){if(S.timer){clearInterval(S.timer);S.timer=null}S.speed=0}
+
+load();unlock(false);pill('','Offline');
+if(!navigator.bluetooth){document.getElementById('btnScan').textContent='Web Bluetooth nicht verfügbar';document.getElementById('btnScan').disabled=true}
+</script>
+</body>
+</html>
